@@ -1,6 +1,7 @@
 package xwhttp
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -20,7 +21,50 @@ type Context struct {
 	StatusCode int
 }
 
+// 实例化的时候直接返回一个指针
+func NewContextInstance(writer http.ResponseWriter, request *http.Request) *Context {
+	return &Context{
+		Writer:     writer,
+		Req:        request,
+		Path:       request.URL.Path,
+		Method:     request.Method,
+		StatusCode: 200,
+	}
+}
+func (c *Context) SetHeader(key string, value string) {
+	c.Writer.Header().Set(key, value)
+}
+func (c *Context) SetStatusCode(code int) {
+	c.StatusCode = code
+	c.Writer.WriteHeader(code)
+}
+
+// 从req中获取
+func (c *Context) PostForm(key string) string {
+	return c.Req.FormValue(key)
+}
+func (c *Context) Query(key string) string {
+	return c.Req.URL.Query().Get(key)
+}
+
+// 以各种格式返回
 func (c Context) String(status int, format string, values ...interface{}) {
-	c.StatusCode = status
+	c.SetStatusCode(status)
+	//不要这样，期望对所有info类的信息都通过方法去set，做到修改属性的收敛
+	//c.StatusCode = status
 	c.Writer.Write([]byte(fmt.Sprintf(format, values...))) // 字符串转换成byte数组的形式
+}
+
+func (c Context) HTML(statuscode int, html string) {
+	c.SetHeader("Content-Type", "text/html")
+	c.SetStatusCode(statuscode)
+	c.Writer.Write([]byte(html))
+}
+func (c Context) Json(statuscode int, j interface{}) {
+	c.SetHeader("Content-Type", "application/json")
+	c.SetStatusCode(statuscode)
+	encoder := json.NewEncoder(c.Writer)
+	if err := encoder.Encode(j); err != nil {
+		fmt.Fprintf(c.Writer, "后端json-encode错误")
+	}
 }
