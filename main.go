@@ -1,7 +1,10 @@
 package main
 
-import "xwace/xwweb/standardhttp"
+import (
+	"xwace/xwweb/xwhttp"
+)
 
 func main() {
-	standardhttp.Main()
+	//standardhttp.Main()
+	xwhttp.Main()
 }
