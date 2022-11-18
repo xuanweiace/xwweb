@@ -6,7 +6,10 @@ import (
 	"net/http"
 )
 
-// 为什么要把返回值也房间来？
+// 定义这个的意义是什么？
+type H map[string]interface{}
+
+// 为什么要把返回值也放进来？
 // 因为设计思想就是：Context 随着每一个请求的出现而产生，请求的结束而销毁，和当前请求强相关的信息都应由 Context 承载
 
 // 想好Context是建造者模式（先都set好了然后统一build），还是直接可以set值的
@@ -21,8 +24,8 @@ type Context struct {
 	StatusCode int
 }
 
-// 实例化的时候直接返回一个指针
-func NewContextInstance(writer http.ResponseWriter, request *http.Request) *Context {
+// 实例化的时候直接返回一个指针。不需要包外暴露，这样可以保证context一定是框架做管理的而不是用户(即用户可以从我context里取东西和放自定义的东西，但是不能滥用与生成)
+func newContextInstance(writer http.ResponseWriter, request *http.Request) *Context {
 	return &Context{
 		Writer:     writer,
 		Req:        request,
@@ -60,7 +63,7 @@ func (c Context) HTML(statuscode int, html string) {
 	c.SetStatusCode(statuscode)
 	c.Writer.Write([]byte(html))
 }
-func (c Context) Json(statuscode int, j interface{}) {
+func (c Context) JSON(statuscode int, j interface{}) {
 	c.SetHeader("Content-Type", "application/json")
 	c.SetStatusCode(statuscode)
 	encoder := json.NewEncoder(c.Writer)

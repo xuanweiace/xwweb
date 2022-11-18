@@ -7,8 +7,9 @@ import (
 
 func main() {
 	//standardhttp.Main()
-	xwhttp.NewInstance()
-
+	engine := xwhttp.NewInstance()
+	engine.Get("/", html_handler)
+	engine.Run(":8080")
 }
 
 func string_handler(c *xwhttp.Context) {
