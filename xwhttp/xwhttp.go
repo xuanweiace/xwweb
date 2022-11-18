@@ -23,6 +23,7 @@ type HandlerContainer struct {
 } //handler定义
 type HandlerFunc func(response http.ResponseWriter, r *http.Request)
 
+// 不设置返回值，则默认返回200？
 func (c HandlerContainer) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	assemble_mapper_key := request.Method + "-" + request.URL.Path
 	if handler, ok := c.mapper[assemble_mapper_key]; ok {
