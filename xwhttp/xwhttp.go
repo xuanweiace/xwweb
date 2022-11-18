@@ -1,6 +1,7 @@
 package xwhttp
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -24,11 +25,20 @@ type HandlerFunc func(response http.ResponseWriter, r *http.Request)
 
 func (c HandlerContainer) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	assemble_mapper_key := request.Method + "-" + request.URL.Path
-	for k, v := range c.mapper {
-		if assemble_mapper_key == k {
-			v(writer, request)
-		}
+	if handler, ok := c.mapper[assemble_mapper_key]; ok {
+		handler(writer, request)
+	} else {
+		fmt.Fprintf(writer, "404 not found： %s\n", request.URL)
 	}
+	//或者下面这种写法，但很显然下面这种会麻烦很多，所以对于map能直接取就不要遍历
+	//for k, v := range c.mapper {
+	//	s := strings.Split(k, "-")
+	//	if s[0] == request.Method && s[1] == request.URL.Path{
+	//		v(writer, request)
+	//		return
+	//	}
+	//}
+	//fmt.Fprintf(writer, "404 not found： %s\n", request.URL)
 }
 
 // 创建一个xwHttpServer实例。工厂方法，因此不设置接收器。相当于一个全局函数
