@@ -22,9 +22,7 @@ type router struct {
 
 func (r *router) handle(c *Context) {
 	assemble_mapper_key := c.Method + "-" + c.Path
-	println("thisis:", assemble_mapper_key)
 	if handler, ok := r.handlers[assemble_mapper_key]; ok {
-		print("找到了")
 		handler(c)
 	}
 }

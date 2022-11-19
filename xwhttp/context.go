@@ -26,7 +26,6 @@ type Context struct {
 
 // 实例化的时候直接返回一个指针。不需要包外暴露，这样可以保证context一定是框架做管理的而不是用户(即用户可以从我context里取东西和放自定义的东西，但是不能滥用与生成)
 func newContextInstance(writer http.ResponseWriter, request *http.Request) *Context {
-	print("request.Method:", request.Method)
 	return &Context{
 		Writer:     writer,
 		Req:        request,
