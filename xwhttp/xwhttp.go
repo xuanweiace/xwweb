@@ -22,7 +22,9 @@ type router struct {
 
 func (r *router) handle(c *Context) {
 	assemble_mapper_key := c.Method + "-" + c.Path
+	println("thisis:", assemble_mapper_key)
 	if handler, ok := r.handlers[assemble_mapper_key]; ok {
+		print("找到了")
 		handler(c)
 	}
 }
@@ -57,6 +59,7 @@ func (e *Engine) Get(route string, handlerFunc HandlerFunc) {
 
 func (e *Engine) Post(route string, handlerFunc HandlerFunc) {
 	assemble_mapper_key := "POST-" + route
+	println(assemble_mapper_key)
 	if _, ok := e.router.handlers[assemble_mapper_key]; ok {
 		panic("已经有该路由了，无法再次注册，路由为：" + assemble_mapper_key) // 一定要把上下文信息输出出来，不然不好定位错误
 	}
