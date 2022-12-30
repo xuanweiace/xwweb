@@ -46,7 +46,7 @@ func (c *Context) SetStatusCode(code int) {
 // 从req中获取
 func (c *Context) PostForm(key string) string {
 	//fmt.Printf("c.Req.PostForm:%q\n", c.Req.PostForm)
-	c.Req.ParseForm()
+	//c.Req.ParseForm() todo 有先后顺序的 有小坑
 	fmt.Printf("c.Req.PostForm:%q\n", c.Req.Form)
 	//fmt.Printf("c.Req.PostForm:%q\n", c.Req.)
 	//fmt.Printf("c.Req.PostFormValue[%s]:%q\n", key, c.Req.PostFormValue(key))
