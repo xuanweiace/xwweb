@@ -15,9 +15,11 @@ func main() {
 	engine.Post("/get_post_html", html_handler)
 	engine.Get("/get_string", string_handler)
 	engine.Run(":8080")
+
 }
 
 func string_handler(c *xwhttp.Context) {
+	fmt.Println("进入了string_handler")
 	c.String(http.StatusOK, "hello [%s], you're at [%s]\n", c.Query("name"), c.Path)
 }
 func html_handler(c *xwhttp.Context) {

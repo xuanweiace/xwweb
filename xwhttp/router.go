@@ -1,6 +1,7 @@
 package xwhttp
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -28,8 +29,11 @@ func (r *router) handle(c *Context) {
 			c.Params[k] = v
 		}
 		assemble_mapper_key := c.Method + "-" + n.pattern
+		fmt.Println(assemble_mapper_key)
 		if handler, ok := r.handlers[assemble_mapper_key]; ok {
 			handler(c)
+		} else {
+			fmt.Println("没找着")
 		}
 	} else {
 		//这里也可以用 fmt.Fprintf(c.Writer, "404 NOT FOUND: %s\n", c.Path) 但是不推荐，因为没法返回状态码。因此推荐所有的response操作都通过context提供的方法执行
@@ -39,8 +43,9 @@ func (r *router) handle(c *Context) {
 
 func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc) {
 	parts := parsePattern(pattern)
-
+	//fmt.Println("parts:", parts)
 	assemble_mapper_key := method + "-" + pattern
+	//fmt.Println("add:assemble_mapper_key=", assemble_mapper_key)
 	if _, ok := r.handlers[assemble_mapper_key]; ok {
 		panic("已经有该路由了，无法再次注册，路由为：" + assemble_mapper_key) // 一定要把上下文信息输出出来，不然不好定位错误
 	}
@@ -57,9 +62,12 @@ func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc
 func (r *router) getRoute(method string, pattern string) (*node, map[string]string) {
 	params := make(map[string]string)
 	realParts := parsePattern(pattern)
+	//fmt.Println("realPartsL:", realParts)
 	var n *node
 	if method == "GET" {
 		n = r.get_roots.search(realParts)
+		//fmt.Printf("node:%q\n", n)
+
 	} else if method == "POST" {
 		n = r.post_roots.search(realParts)
 	} else {
@@ -75,6 +83,7 @@ func (r *router) getRoute(method string, pattern string) (*node, map[string]stri
 				break
 			}
 		}
+		//fmt.Printf("node:%q par:%q", n, params)
 		return n, params
 	}
 	return nil, nil

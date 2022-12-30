@@ -1,6 +1,8 @@
 package xwhttp
 
-import "strings"
+import (
+	"strings"
+)
 
 type node struct {
 	pattern  string  // 待匹配路由，例如 /p/:lang
@@ -31,10 +33,12 @@ func (n *node) insert(parts []string) {
 				children: make([]*node, 0),
 				isWild:   part[0] == ':' || part[0] == '*',
 			})
+			rt = rt.children[len(rt.children)-1] //这一步别忘了！！！
 		}
 	}
 	//完全匹配结束，则在对应节点填充pattern字段标记这是一个完整路由
 	rt.pattern = joinParts(parts)
+	//fmt.Printf("rt:%v", rt)
 }
 
 // parts里肯定放不包含*和: 是精确路由
