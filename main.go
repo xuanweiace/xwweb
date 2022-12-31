@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"time"
 	"xwace/xwweb/xwhttp"
 )
 
@@ -22,7 +24,8 @@ func main() {
 	v2 := engine.Group("/v2")
 	v2.Get("/hello/:name", string_handler2) // todo 有点问题待解决
 	v2.Post("/login", json_handler)
-
+	engine.Use(xwhttp.Logger())
+	v2.Use(middlewareForV2())
 	engine.Run(":8080")
 
 }
@@ -42,4 +45,15 @@ func json_handler(c *xwhttp.Context) {
 		"username": c.PostForm("username"),
 		"password": c.PostForm("password"),
 	})
+}
+
+func middlewareForV2() xwhttp.HandlerFunc {
+	return func(c *xwhttp.Context) {
+		// Start timer
+		t := time.Now()
+		// 如果服务器发生错误，返回500状态码，注意这时候并不会panic，下一行日志记录会继续执行
+		c.Fail(500, "Internal Server Error")
+		// Calculate resolution time
+		log.Printf("[%d] %s in %v for group v2", c.StatusCode, c.Req.RequestURI, time.Since(t))
+	}
 }

@@ -19,8 +19,9 @@ type Engine struct {
 	groups      []*RouteGroup
 }
 type RouteGroup struct {
-	engine *Engine
-	prefix string
+	engine      *Engine
+	prefix      string
+	middlewares []HandlerFunc
 }
 
 // handler定义
@@ -29,6 +30,11 @@ type HandlerFunc func(c *Context)
 func (e *Engine) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	//new一个Context，包装所有的请求生命周期所需要的对象，后续所有操作都直接用context就可以了。
 	c := newContextInstance(writer, request)
+	for _, group := range e.groups {
+		if strings.HasPrefix(request.URL.Path, group.prefix) {
+			c.handlers = append(c.handlers, group.middlewares...)
+		}
+	}
 	e.router.handle(c)
 }
 
@@ -71,6 +77,10 @@ func (g *RouteGroup) Group(route string) *RouteGroup {
 	}
 	rg.engine.groups = append(rg.engine.groups, rg)
 	return rg
+}
+
+func (g *RouteGroup) Use(middlewares ...HandlerFunc) {
+	g.middlewares = append(g.middlewares, middlewares...)
 }
 
 func (e *Engine) Run(addr string) {

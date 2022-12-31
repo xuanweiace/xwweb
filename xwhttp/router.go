@@ -23,22 +23,28 @@ func newRouter() *router {
 func (r *router) handle(c *Context) {
 	fmt.Println("c.Path:", c.Path)
 	n, params := r.getRoute(c.Method, c.Path)
+	var assemble_mapper_key string
 	if n != nil {
 		//可以直接赋值或者copy的，如果要这么写的话，需要在newContextInstance的时候make()才可以
 		for k, v := range params {
 			c.Params[k] = v
 		}
-		assemble_mapper_key := c.Method + "-" + n.pattern
+		assemble_mapper_key = c.Method + "-" + n.pattern
 		fmt.Println("当前请求的路径是:", assemble_mapper_key)
-		if handler, ok := r.handlers[assemble_mapper_key]; ok {
-			handler(c)
-		} else {
-			fmt.Println("没找着", assemble_mapper_key)
-		}
-	} else {
-		//这里也可以用 fmt.Fprintf(c.Writer, "404 NOT FOUND: %s\n", c.Path) 但是不推荐，因为没法返回状态码。因此推荐所有的response操作都通过context提供的方法执行
-		c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
 	}
+	// 得到handler
+	var handler HandlerFunc
+	if handler_func, ok := r.handlers[assemble_mapper_key]; ok {
+		handler = handler_func
+	} else {
+		handler = func(c *Context) {
+			//这里也可以用 fmt.Fprintf(c.Writer, "404 NOT FOUND: %s\n", c.Path) 但是不推荐，因为没法返回状态码。因此推荐所有的response操作都通过context提供的方法执行
+			c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
+		}
+	}
+	// 把handler加到context的中间件后面
+	c.handlers = append(c.handlers, handler)
+	c.Next()
 }
 
 func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc) {
