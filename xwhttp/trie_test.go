@@ -3,6 +3,7 @@ package xwhttp
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -53,5 +54,16 @@ func TestGetRoute(t *testing.T) {
 	}
 
 	fmt.Printf("matched path: %s, params['name']: %s\n", n.pattern, ps["name"])
+
+}
+
+func Test_strings(t *testing.T) {
+	pattern := "/"
+	ans := strings.Split(pattern, "/")
+	fmt.Println(len(ans))
+	fmt.Printf("%v, %q", ans, ans)
+	if ok := reflect.DeepEqual(ans, []string{"", ""}); !ok {
+		t.Fatal("不正确")
+	}
 
 }

@@ -33,6 +33,7 @@ func newContextInstance(writer http.ResponseWriter, request *http.Request) *Cont
 		Path:       request.URL.Path,
 		Method:     request.Method,
 		StatusCode: 200,
+		Params:     map[string]string{},
 	}
 }
 func (c *Context) SetHeader(key string, value string) {

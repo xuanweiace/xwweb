@@ -1,11 +1,13 @@
 package xwhttp
 
 import (
+	"fmt"
 	"strings"
 )
 
+// router初始化时一个空node，insert是在该node上添加children
 type node struct {
-	pattern  string  // 待匹配路由，例如 /p/:lang
+	pattern  string  // 待匹配路由，例如 /p/:lang。 若为""则代表该node不是完整路由
 	part     string  // 路由中的一部分，例如 :lang
 	children []*node // 子节点，例如 [doc, tutorial, intro]
 	isWild   bool    // 是否精确匹配，part 含有 : 或 * 时为true
@@ -45,7 +47,9 @@ func (n *node) insert(parts []string) {
 // 最后只需要返回匹配到的叶子结点就好了 因为可以通过叶子结点保存的信息复现出整个路径
 func (n *node) search(parts []string) *node {
 	rt := n
+
 	for _, part := range parts {
+		fmt.Printf("root:%q\n", rt)
 		//优先找精确路由
 		var n0, n1, n2 *node //依次是，精确匹配、模糊匹配、通配符匹配
 		for _, child := range rt.children {

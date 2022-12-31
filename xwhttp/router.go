@@ -21,19 +21,19 @@ func newRouter() *router {
 	}
 }
 func (r *router) handle(c *Context) {
-
+	fmt.Println("c.Path:", c.Path)
 	n, params := r.getRoute(c.Method, c.Path)
 	if n != nil {
-		//可以直接赋值或者copy的
+		//可以直接赋值或者copy的，如果要这么写的话，需要在newContextInstance的时候make()才可以
 		for k, v := range params {
 			c.Params[k] = v
 		}
 		assemble_mapper_key := c.Method + "-" + n.pattern
-		fmt.Println(assemble_mapper_key)
+		fmt.Println("当前请求的路径是:", assemble_mapper_key)
 		if handler, ok := r.handlers[assemble_mapper_key]; ok {
 			handler(c)
 		} else {
-			fmt.Println("没找着")
+			fmt.Println("没找着", assemble_mapper_key)
 		}
 	} else {
 		//这里也可以用 fmt.Fprintf(c.Writer, "404 NOT FOUND: %s\n", c.Path) 但是不推荐，因为没法返回状态码。因此推荐所有的response操作都通过context提供的方法执行
@@ -62,11 +62,11 @@ func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc
 func (r *router) getRoute(method string, pattern string) (*node, map[string]string) {
 	params := make(map[string]string)
 	realParts := parsePattern(pattern)
-	//fmt.Println("realPartsL:", realParts)
+	fmt.Println("realPartsL:", realParts)
 	var n *node
 	if method == "GET" {
 		n = r.get_roots.search(realParts)
-		//fmt.Printf("node:%q\n", n)
+		fmt.Printf("node:%q\n", n)
 
 	} else if method == "POST" {
 		n = r.post_roots.search(realParts)
