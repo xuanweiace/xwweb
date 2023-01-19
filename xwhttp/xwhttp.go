@@ -99,7 +99,7 @@ func (g *RouteGroup) Static(urlRelativePath string, serverPath string) {
 	//（注意，xwhttp是一个web框架，其中Engine是我们的server引擎，因为它实现了ServeHTTP方法。只不过我们没有显示调用它，而是注册到go原生的http里，在请求到来的时候让原生http框架帮我们调用。现在请求被我们接管，来到我们这边我们需要显示调用）
 	fs := http.Dir(serverPath)
 	fileServer := http.StripPrefix(urlAbsolutePath, http.FileServer(fs))
-	//注意这个函数不能拿出去单独写了，因为没有fileServer这个变量给我们用
+	//注意这个函数不能拿出去单独写了，因为没有fileServer这个变量给我们用（这就是闭包的作用，相当于免费的全局变量用）
 	handler := func(c *Context) {
 		filepath := c.Param("filepath")
 		fmt.Println("filepath:", filepath)
