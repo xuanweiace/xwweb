@@ -2,6 +2,7 @@ package xwhttp
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 )
@@ -110,4 +111,31 @@ func Test_for的坑(t *testing.T) {
 
 	time.Sleep(time.Second * 10)
 
+}
+func Test_文件修改能否被Read到(t *testing.T) {
+	f, err := os.Open("./other_test.go")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println("已经打开")
+	time.Sleep(15e9)
+	bs := make([]byte, 10000, 10000)
+	n, _ := f.Read(bs)
+
+	fmt.Println("n:", n)
+	fmt.Println("bs:")
+	fmt.Println(bs)
+	fmt.Println(string(bs)) // 经测试，程序启动后修改的当前文件，则修改后的内容不会被输出
+	//time.AfterFunc()
+}
+
+func change(s []string) {
+	fmt.Printf("%p\n", s)
+	s[0] = "asd"
+}
+func Test_关于切片复制(t *testing.T) {
+	a := []string{"a", "b"}
+	fmt.Printf("%p\n", a)
+	change(a[:])
+	fmt.Println(a)
 }

@@ -21,7 +21,8 @@ func FormatAsDate(t time.Time) string {
 }
 func main() {
 	//standardhttp.Main()
-	engine := xwhttp.NewInstance()
+	engine := xwhttp.Default()
+
 	engine.SetFuncMap(template.FuncMap{
 		"FormatAsDate": FormatAsDate,
 	})
@@ -64,10 +65,11 @@ func main() {
 
 func string_handler(c *xwhttp.Context) {
 	fmt.Println("进入了string_handler")
-	c.String(http.StatusOK, "hello [%s], you're at [%s]\n", c.Query("name"), c.Path)
+	names := []string{"testsae"}
+	c.String(http.StatusOK, "hello [%s], you're at %s tmp:%s\n", c.Param("name"), c.Path, names[100])
 }
 func string_handler2(c *xwhttp.Context) {
-	c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
+	c.String(http.StatusOK, "hello %s, you're at %s \n", c.Param("name"), c.Path)
 }
 
 func html_handler_wrap(name string, data any) xwhttp.HandlerFunc {

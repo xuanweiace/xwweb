@@ -57,6 +57,12 @@ func NewInstance() *Engine {
 	return e
 }
 
+func Default() *Engine {
+	engine := NewInstance()
+	engine.Use(Logger(), Recovery())
+	return engine
+}
+
 //如果只实现到动态路由这一步，对于engine里只有router的这种，结构体里面只包含一个属性的这种情况，其实一级就够了，不需要分成两个层级。（即直接engine.addRoute()，而不用engine.router.addRoute()这样）
 
 // 用户友好向的API设计，其实就是拆分函数方便用户调用
