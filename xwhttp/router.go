@@ -51,7 +51,7 @@ func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc
 	parts := parsePattern(pattern)
 	//fmt.Println("parts:", parts)
 	assemble_mapper_key := method + "-" + pattern
-	//fmt.Println("add:assemble_mapper_key=", assemble_mapper_key)
+	fmt.Println("add:assemble_mapper_key=", assemble_mapper_key)
 	if _, ok := r.handlers[assemble_mapper_key]; ok {
 		panic("已经有该路由了，无法再次注册，路由为：" + assemble_mapper_key) // 一定要把上下文信息输出出来，不然不好定位错误
 	}
@@ -68,11 +68,11 @@ func (r *router) addRoute(method string, pattern string, handlerFunc HandlerFunc
 func (r *router) getRoute(method string, pattern string) (*node, map[string]string) {
 	params := make(map[string]string)
 	realParts := parsePattern(pattern)
-	fmt.Println("realPartsL:", realParts)
+	//fmt.Println("realPartsL:", realParts)
 	var n *node
 	if method == "GET" {
 		n = r.get_roots.search(realParts)
-		fmt.Printf("node:%q\n", n)
+		//fmt.Printf("node:%q\n", n)
 
 	} else if method == "POST" {
 		n = r.post_roots.search(realParts)

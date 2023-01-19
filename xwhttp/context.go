@@ -26,10 +26,11 @@ type Context struct {
 	// middleware
 	handlers []HandlerFunc
 	index    int
+	engine   *Engine
 }
 
 // 实例化的时候直接返回一个指针。不需要包外暴露，这样可以保证context一定是框架做管理的而不是用户(即用户可以从我context里取东西和放自定义的东西，但是不能滥用与生成)
-func newContextInstance(writer http.ResponseWriter, request *http.Request) *Context {
+func newContextInstance(writer http.ResponseWriter, request *http.Request, engine *Engine) *Context {
 	return &Context{
 		Writer:     writer,
 		Req:        request,
@@ -39,6 +40,7 @@ func newContextInstance(writer http.ResponseWriter, request *http.Request) *Cont
 		Params:     map[string]string{},
 		handlers:   []HandlerFunc{}, // 一个优化是，这里只是赋值为nil，在ServeHTTP中如果判定有中间件，再分配空间。这样可以减少小
 		index:      -1,
+		engine:     engine,
 	}
 }
 func (c *Context) SetHeader(key string, value string) {
@@ -75,10 +77,13 @@ func (c *Context) String(status int, format string, values ...interface{}) {
 	c.Writer.Write([]byte(fmt.Sprintf(format, values...))) // 字符串转换成byte数组的形式
 }
 
-func (c *Context) HTML(statuscode int, html string) {
+func (c *Context) HTML(statuscode int, name string, data any) {
 	c.SetHeader("Content-Type", "text/html")
 	c.SetStatusCode(statuscode)
-	c.Writer.Write([]byte(html))
+	fmt.Println("c.engine:", c.engine)
+	if err := c.engine.htmlTemplete.ExecuteTemplate(c.Writer, name, data); err != nil {
+		c.Fail(500, err.Error())
+	}
 }
 func (c *Context) JSON(statuscode int, j interface{}) {
 	c.SetHeader("Content-Type", "application/json")

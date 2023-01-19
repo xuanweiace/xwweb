@@ -1,7 +1,6 @@
 package xwhttp
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -40,7 +39,7 @@ func (n *node) insert(parts []string) {
 	}
 	//完全匹配结束，则在对应节点填充pattern字段标记这是一个完整路由
 	rt.pattern = joinParts(parts)
-	//fmt.Printf("rt:%v", rt)
+	//fmt.Printf("rt:%v\n", rt)
 }
 
 // parts里肯定放不包含*和: 是精确路由
@@ -49,9 +48,9 @@ func (n *node) search(parts []string) *node {
 	rt := n
 
 	for _, part := range parts {
-		fmt.Printf("root:%q\n", rt)
+		//fmt.Printf("root:%q\n", rt)
 		//优先找精确路由
-		var n0, n1, n2 *node //依次是，精确匹配、模糊匹配、通配符匹配
+		var n0, n1, n2 *node //依次是，精确匹配、模糊匹配、通配符匹配。。。其实完全可以只用一个变量啊 没必要3个变量！！！
 		for _, child := range rt.children {
 			if child.part == part {
 				n0 = child
@@ -67,6 +66,7 @@ func (n *node) search(parts []string) *node {
 			rt = n1
 		} else if n2 != nil {
 			rt = n2
+			break // 找到通配符了直接返回，不再向后匹配
 		} else {
 			return nil
 		}
